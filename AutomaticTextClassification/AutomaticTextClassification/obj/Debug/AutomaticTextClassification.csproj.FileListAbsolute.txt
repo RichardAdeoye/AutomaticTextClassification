@@ -1,0 +1,7 @@
+C:\Users\adeoy\Documents\AutomaticTextClassification\AutomaticTextClassification\bin\Debug\AutomaticTextClassification.exe
+C:\Users\adeoy\Documents\AutomaticTextClassification\AutomaticTextClassification\bin\Debug\AutomaticTextClassification.exe.config
+C:\Users\adeoy\Documents\AutomaticTextClassification\AutomaticTextClassification\obj\Debug\AutomaticTextClassification.csproj.CoreCompileInputs.cache
+C:\Users\adeoy\Documents\AutomaticTextClassification\AutomaticTextClassification\obj\Debug\AutomaticTextClassification.exe
+C:\Users\adeoy\Documents\AutomaticTextClassification\AutomaticTextClassification\obj\Debug\AutomaticTextClassification.pdb
+C:\Users\adeoy\Documents\AutomaticTextClassification\AutomaticTextClassification\bin\Debug\AutomaticTextClassification.pdb
+C:\Users\adeoy\Documents\AutomaticTextClassification\AutomaticTextClassification\obj\Debug\AutomaticTextClassification.csprojAssemblyReference.cache
