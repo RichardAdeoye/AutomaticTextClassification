@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 
 namespace AutomaticTextClassification
@@ -17,18 +18,18 @@ namespace AutomaticTextClassification
             var textFile = File.ReadAllText(textFilePath);
 
             var stopWordsFilePath = Path.Combine(Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", ""), "stopwords.txt");
-
             var stopWordsFile = File.ReadAllText(stopWordsFilePath);
             stopWordsFile = stopWordsFile.Replace("\r", " ");
             stopWordsFile = stopWordsFile.Replace("\n", "");
-
             var stopWords = stopWordsFile.Split(' '); 
             
 
-            var trainingTextWords = textFile.Split(' ', ',', '.').Distinct();
+            var trainingTextWords = textFile.Split(' ', ',', '.').Distinct().ToList();//Unique words in training set
            
-            var trainingTextList = trainingTextWords.Where(i => !stopWords.Contains(i)).ToList();
-            foreach (var word in textFile.Split(' ', ',', '.'))
+            var trainingTextList = trainingTextWords.Where(i => !stopWords.Contains(i)).ToList();//stop words removed from list
+
+            
+            foreach (var word in textFile.Split(' ', ',', '.'))// total number of unique words throughout the training documents 
             {
                 if (word != "")
                 {
@@ -37,7 +38,13 @@ namespace AutomaticTextClassification
                 }
 
             }
-
+            var csv = new StringBuilder();
+            csv.AppendLine(trainingTextList.ToString());
+            string csvPath =
+                Path.Combine(Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", ""),
+                    "tables.csv");
+           
+            File.AppendAllText(csvPath, csv.ToString());
             Console.ReadLine();
 
         }
