@@ -11,24 +11,52 @@ namespace AutomaticTextClassification
     class Program
     {
         static void Main(string[] args)
-        {//get all to get prior probability (look at notes)
+        {
             string[] textFiles = Directory
-                .GetFiles(Path.Combine(
-                    Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug",string.Empty)), "*.txt")
-                .Select(Path.GetFileName)
-                .ToArray();
+                 .GetFiles(Path.Combine(
+                     Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", string.Empty)), "*.txt")
+                 .Select(Path.GetFileName)
+                 .ToArray();
+
             List<string> trainingCategories = new List<string>();// get prior probability of files
+
             foreach (var file in textFiles)
             {
                 if (!file.Contains("test") && !file.Contains("stop"))
                 {
                     trainingCategories.Add(file);
-                    //Console.WriteLine(file);
+                    Console.WriteLine(file);
                 }
             }
 
+            var tDocCount = trainingCategories.Count();
+
+            double coalitionTotal = 0f;
+            double labourTotal = 0f;
+            double conservativeTotal = 0f;
+            foreach (var trainingCategory in trainingCategories)
+            {
+                if (trainingCategory.Contains("Coalition"))
+                {
+                    coalitionTotal = coalitionTotal + 1;
+                }
+                else if (trainingCategory.Contains("Labour"))
+                {
+                    labourTotal = labourTotal + 1;
+                }
+                else if (trainingCategory.Contains("Conservative"))
+                {
+                    conservativeTotal = conservativeTotal + 1;
+                }
+
+            }
+            double coalitionPriorProb = coalitionTotal / tDocCount;
+            double labourPriorProb = labourTotal / tDocCount;
+            double conservativePriorProb = conservativeTotal / tDocCount;
+
             var textFilePath = Path.Combine(Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", ""), "Conservative27thMay2015.txt");
             //Create user input for files and separate training and test file variables
+            //get collection of each category
             var textFile = File.ReadAllText(textFilePath).ToLower();
             textFile = textFile.Replace("\n", "");
             textFile = textFile.Replace("\r", "");
@@ -59,10 +87,10 @@ namespace AutomaticTextClassification
             var i = 0;
             foreach (var word in words.Distinct())
             {
-                Console.WriteLine(word + ":" + frequency[i]);// write this to csv
+                //Console.WriteLine(word + ":" + frequency[i]);// write this to csv
                 i++;
             }
-          
+
 
             var csv = new StringBuilder();
             csv.AppendLine(trainingTextList.ToString());
