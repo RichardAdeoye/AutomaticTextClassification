@@ -13,7 +13,7 @@ namespace AutomaticTextClassification
         public static void ProcessTextFiles(IEnumerable<string> trainingCategories)
         {
             RefreshCsvFiles();
-
+            //if category maatch ...for each catgory where names match join text and extract it
             foreach (var trainingCategory in trainingCategories)
             {//group categories 
 
@@ -26,39 +26,22 @@ namespace AutomaticTextClassification
                 var textFile = File.ReadAllText(textFilePath).ToLower();
                 textFile = textFile.Replace("\n", "");
                 textFile = textFile.Replace("\r", "");
-                var trainingTextWords = textFile.Split(' ', ',', '.').Distinct().ToList(); //Unique words in training set
+                var uniqueTrainingTextWords = textFile.Split(' ', ',', '.').Distinct().ToList(); //Unique words in training set
 
                 var textWords = textFile.Split(' ', ',', '.').ToList();
 
                 List<string> trainingTextList = RemoveStopWords(textWords).ToList();
+                Dictionary<string, int> wordDictionary = new Dictionary<string, int>();
 
-                List<int> frequency = new List<int>();
-                List<string> words = new List<string>();
-
-                foreach (var word in trainingTextList
-                ) // total number of unique words throughout the training documents (Frequency)
+                foreach (var word in trainingTextList.Distinct()) // total number of unique words throughout the training documents (Frequency)
                 {
-                    int trainingWordFrequency;
                     if (word != "")
                     {
-                        trainingWordFrequency = trainingTextList.Count(x => x == word);
-                        //Console.WriteLine(word + ": " + trainingWordFrequency);
-                        words.Add(word);
-                        frequency.Add(trainingWordFrequency);
-                    }
-
-                    ;
+                        int wordFrequency = trainingTextList.Count(x => x == word);
+                        Console.WriteLine(word + ":" + wordFrequency); // write this to csv
+                        wordDictionary.Add(word, wordFrequency);
+                    };
                 }
-
-                var i = 0;
-                Dictionary<string, int> wordDictionary = new Dictionary<string, int>();
-                foreach (var word in words.Distinct())
-                {
-                    Console.WriteLine(word + ":" + frequency[i]); // write this to csv
-                    i++;
-                    wordDictionary.Add(word, frequency[i]);//fix frequency
-                }
-
 
                 string csv = String.Join(
                     Environment.NewLine,
@@ -67,6 +50,8 @@ namespace AutomaticTextClassification
 
                 if (trainingCategory.Contains("Labour"))
                 {
+                    //join the text in identical categories here somehow!
+                    
                     tableName = string.Format(@"{0}Table.csv", "Labour");
                 }
                 else if (trainingCategory.Contains("Conservative"))
