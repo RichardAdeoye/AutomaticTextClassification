@@ -9,6 +9,7 @@ namespace AutomaticTextClassification
     {
         public static string CurrentDirectory = Path.Combine(Directory.GetCurrentDirectory()
             .Replace("\\AutomaticTextClassification\\bin\\Debug", ""));
+       
 
         public static void ProcessTextFiles(IEnumerable<string> trainingCategories)
         {
@@ -30,31 +31,29 @@ namespace AutomaticTextClassification
 
                 var textWords = textFile.Split(' ', ',', '.').ToList();
 
-                List<string> trainingTextList = RemoveStopWords(textWords).ToList();
+                List<string> trainingTextList = RemoveStopWords(textWords).ToList();//get count from this
                 Dictionary<string, int> wordDictionary = new Dictionary<string, int>();
-
+                List<double> conditionalProbabilities = new List<double>();
                 foreach (var word in trainingTextList.Distinct()) // total number of unique words throughout the training documents (Frequency)
                 {
                     if (word != "")
                     {
                         int wordFrequency = trainingTextList.Count(x => x == word);
-                        Console.WriteLine(word + ":" + wordFrequency); // write this to csv
+                    
                         wordDictionary.Add(word, wordFrequency);
+
+                        double conProbability = (wordFrequency + 1f) / (trainingTextList.Count + uniqueTrainingTextWords.Count);
+                        conditionalProbabilities.Add(conProbability);
+                        Console.WriteLine(word + ": " + wordFrequency + " -------" + conProbability); // write this to csv
                     };
                 }
-
-                string csv = String.Join(
-                    Environment.NewLine,
-                    wordDictionary.Select(d => d.Key + "," + d.Value + ","));// Add count to table
+                //string csv = String.Join(
+                //    Environment.NewLine,
+                //    wordDictionary.Select(d => d.Key + "," + d.Value + "," + conditionalProbabilities.Select(n => n)));// Add count to table
                 string tableName = null;
-
-                if (trainingCategory.Contains("Labour"))
-                {
-                    //join the text in identical categories here somehow!
-                    
-                    tableName = string.Format(@"{0}Table.csv", "Labour");
-                }
-                else if (trainingCategory.Contains("Conservative"))
+                
+                
+                if (trainingCategory.Contains("Conservative"))
                 {
                     tableName = string.Format(@"{0}Table.csv", "Conservative");
                 }
@@ -62,13 +61,23 @@ namespace AutomaticTextClassification
                 {
                     tableName = string.Format(@"{0}Table.csv", "Coalition");
                 }
+                else if (trainingCategory.Contains("Labour"))
+                {
+                    tableName = string.Format(@"{0}Table.csv", "Labour");
+                }
 
+                var writer = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", ""), tableName));
+                int i = 0;
+                foreach (var data in wordDictionary)
+                {
+                    writer.WriteLine("{0},{1},{2}", data.Key, data.Value, conditionalProbabilities[i]);
+                    i++;
+                }
+                //string csvPath =
+                //    Path.Combine(Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", ""),
+                //        tableName);
 
-                string csvPath =
-                    Path.Combine(Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", ""),
-                        tableName);
-
-                File.AppendAllText(csvPath, csv);
+               // File.AppendAllText(csvPath, csv);
             }
 
         }
