@@ -19,20 +19,17 @@ namespace AutomaticTextClassification
             foreach (var trainingCategory in trainingCategories)
             {//group categories 
 
-                var textFilePath = Path.Combine(CurrentDirectory, trainingCategory);
+                var trainingFilePath = Path.Combine(CurrentDirectory, trainingCategory);
 
 
                 //Create user input for files and separate training and test file variables
                 //get collection of each category
 
-                var textFile = File.ReadAllText(textFilePath).ToLower();
-                textFile = textFile.Replace("\n", "");
-                textFile = textFile.Replace("\r", "");
-                var uniqueTrainingTextWords = textFile.Split(' ', ',', '.').Distinct().ToList(); //Unique words in training set
+                string trainingTextFile;
+                List<string> trainingTextList;
+                ProcessFileToList(trainingFilePath, out trainingTextFile, out trainingTextList);
 
-                var textWords = textFile.Split(' ', ',', '.').ToList();
-
-                List<string> trainingTextList = RemoveStopWords(textWords).ToList();//get count from this
+                var uniqueTrainingTextWords = trainingTextFile.Split(' ', ',', '.').Distinct().ToList(); //Unique words in training set
                 Dictionary<string, int> wordDictionary = new Dictionary<string, int>();
                 List<double> conditionalProbabilities = new List<double>();
                 foreach (var word in trainingTextList.Distinct()) // total number of unique words throughout the training documents (Frequency)
@@ -45,13 +42,42 @@ namespace AutomaticTextClassification
 
                         double conProbability = (wordFrequency + 1f) / (trainingTextList.Count + uniqueTrainingTextWords.Count);
                         conditionalProbabilities.Add(conProbability);
-                        Console.WriteLine(word + ": " + wordFrequency + " -------" + conProbability);
+                        //Console.WriteLine(word + ": " + wordFrequency + " -------" + conProbability);
                     };
                 }
-
+                Console.WriteLine(conditionalProbabilities.Where(x=>x.Equals("Coalition")).ToString());//split up conditional probablities 
                 FileWriter.WriteToCsv(trainingCategory, wordDictionary, conditionalProbabilities);
             }
+            var testFilePath = Path.Combine(CurrentDirectory, "test1.txt");
+            string testFile;
+            List<string> testList;
+            ProcessFileToList(testFilePath, out testFile, out testList);
 
+            foreach(var word in testList)
+            {
+                if(word != "")
+                {
+                   // Console.WriteLine(word);
+                }
+            }
+        }
+        
+        
+        private static void ProcessFileToList(string textFilePath, out string textFile, out List<string> textList)
+        {
+            textFile = ReFormatTextFile(textFilePath);
+            var textWords = textFile.Split(' ', ',', '.').ToList();
+
+            textList = RemoveStopWords(textWords).ToList();
+            //get count from this
+        }
+
+        private static string ReFormatTextFile(string textFilePath)
+        {
+            var textFile = File.ReadAllText(textFilePath).ToLower();
+            textFile = textFile.Replace("\n", "");
+            textFile = textFile.Replace("\r", "");
+            return textFile;
         }
 
         private static void RefreshCsvFiles()
