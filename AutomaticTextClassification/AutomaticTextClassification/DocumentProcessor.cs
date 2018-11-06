@@ -1,16 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using static AutomaticTextClassification.Program;
 
 namespace AutomaticTextClassification
 {
     class DocumentProcessor
     {
-        public static string CurrentDirectory = Path.Combine(Directory.GetCurrentDirectory()
-            .Replace("\\AutomaticTextClassification\\bin\\Debug", ""));
+        public static readonly List<double> CoalitionConProb = new List<double>();
+        public static readonly List<double> ConservativeConProb = new List<double>();
+        public static readonly List<double> LabourConProb = new List<double>();
+
+
+        public static Dictionary<string, int> LabDictionary { get; set; }
+
+        public static Dictionary<string, int> ConDictionary { get; set; }
+
+        public static Dictionary<string, int> CoalDictionary { get; set; }
 
         public static void ProcessTextFiles(IEnumerable<string> trainingCategories)
         {
@@ -45,25 +51,47 @@ namespace AutomaticTextClassification
                         //Console.WriteLine(word + ": " + wordFrequency + " -------" + conProbability);
                     };
                 }
-                Console.WriteLine(conditionalProbabilities.Where(x=>x.Equals("Coalition")).ToString());//split up conditional probablities 
+                CoalDictionary = new Dictionary<string, int>();
+                ConDictionary = new Dictionary<string, int>();
+                LabDictionary = new Dictionary<string, int>();
+                foreach (var i in wordDictionary)
+                {
+                    if (trainingCategory.Contains(Coalition))
+                    {
+                        CoalDictionary.Add(i.Key, i.Value);
+                    }
+                    else if (trainingCategory.Contains(Conservative))
+                    {
+                        ConDictionary.Add(i.Key, i.Value);
+                    }
+                    else if (trainingCategory.Contains(Labour))
+                    {
+                       LabDictionary.Add(i.Key, i.Value);
+                    }
+                }
+
+                foreach (var conditionalProbability in conditionalProbabilities)
+                {
+                    if (trainingCategory.Contains(Coalition))
+                    {
+                        CoalitionConProb.Add(conditionalProbability);
+                    }
+                    if (trainingCategory.Contains(Conservative))
+                    {
+                        ConservativeConProb.Add(conditionalProbability);
+                    }
+                    if (trainingCategory.Contains(Labour))
+                    {
+                        LabourConProb.Add(conditionalProbability);
+                    }
+                }
                 FileWriter.WriteToCsv(trainingCategory, wordDictionary, conditionalProbabilities);
             }
-            var testFilePath = Path.Combine(CurrentDirectory, "test1.txt");
-            string testFile;
-            List<string> testList;
-            ProcessFileToList(testFilePath, out testFile, out testList);
-
-            foreach(var word in testList)
-            {
-                if(word != "")
-                {
-                   // Console.WriteLine(word);
-                }
-            }
+            DocumentClassifier.Classify();
         }
-        
-        
-        private static void ProcessFileToList(string textFilePath, out string textFile, out List<string> textList)
+
+
+        public static void ProcessFileToList(string textFilePath, out string textFile, out List<string> textList)
         {
             textFile = ReFormatTextFile(textFilePath);
             var textWords = textFile.Split(' ', ',', '.').ToList();
@@ -82,7 +110,7 @@ namespace AutomaticTextClassification
 
         private static void RefreshCsvFiles()
         {
-            var directory = Directory.GetFiles(CurrentDirectory);
+            var directory = Directory.GetFiles(Program.CurrentDirectory);
             foreach (var f in directory)
             {
                 if (f.Contains(".csv"))

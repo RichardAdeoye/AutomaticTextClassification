@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using static AutomaticTextClassification.Program;
 
 namespace AutomaticTextClassification
 {
@@ -18,24 +19,23 @@ namespace AutomaticTextClassification
 
                 string tableName = null;
 
-                if (trainingCategory.Contains("Labour"))
+                if (trainingCategory.Contains(Labour))
                 {
                     //join the text in identical categories and total their count here somehow!
-
-                    tableName = $@"{"Labour"}Table.csv";
+                    tableName = $@"{Labour}Table.csv";
                 }
-                else if (trainingCategory.Contains("Conservative"))
+                else if (trainingCategory.Contains(Conservative))
                 {
-                    tableName = $@"{"Conservative"}Table.csv";
+                    tableName = $@"{Conservative}Table.csv";
                 }
-                else if (trainingCategory.Contains("Coalition"))
+                else if (trainingCategory.Contains(Coalition))
                 {
-                    tableName = $@"{"Coalition"}Table.csv";
+                    tableName = $@"{Coalition}Table.csv";
                 }
 
                 string csvPath =
                     Path.Combine(
-                        Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", ""),
+                       CurrentDirectory,
                         tableName ?? throw new InvalidOperationException());
 
                 File.AppendAllText(csvPath, csv);

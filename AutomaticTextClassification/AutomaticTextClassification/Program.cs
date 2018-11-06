@@ -1,20 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
+
 namespace AutomaticTextClassification
 {
     class Program
     {
+        public const string Coalition = "Coalition";
+        public const string Conservative = "Conservative";
+        public const string Labour = "Labour";
+
+        public static string CurrentDirectory = Path.Combine(Directory.GetCurrentDirectory()
+            .Replace("\\AutomaticTextClassification\\bin\\Debug", ""));
+
+        public static double CoalitionPriorProb;
+        public static double LabourPriorProb;
+        public static double ConservativePriorProb;
+
         static void Main(string[] args)
         {
             string[] textFiles = Directory
                  .GetFiles(Path.Combine(
-                     Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", string.Empty)), "*.txt")
+                   CurrentDirectory), "*.txt")
                  .Select(Path.GetFileName)
                  .ToArray();
 
@@ -36,29 +43,29 @@ namespace AutomaticTextClassification
             double conservativeTotal = 0f;
             foreach (var trainingCategory in trainingCategories)
             {
-                if (trainingCategory.Contains("Coalition"))
+                if (trainingCategory.Contains(Coalition))
                 {
                     coalitionTotal = coalitionTotal + 1;
                 }
-                else if (trainingCategory.Contains("Labour"))
+                else if (trainingCategory.Contains(Labour))
                 {
                     labourTotal = labourTotal + 1;
                 }
-                else if (trainingCategory.Contains("Conservative"))
+                else if (trainingCategory.Contains(Conservative))
                 {
                     conservativeTotal = conservativeTotal + 1;
                 }
 
             }
-            double coalitionPriorProb = coalitionTotal / tDocCount;
-            double labourPriorProb = labourTotal / tDocCount;
-            double conservativePriorProb = conservativeTotal / tDocCount;
+           
+            CoalitionPriorProb = coalitionTotal / tDocCount;
+           
+            LabourPriorProb = labourTotal / tDocCount;
+            
+            ConservativePriorProb = conservativeTotal / tDocCount;
 
             DocumentProcessor.ProcessTextFiles(trainingCategories);
            
         }
-
-
-        
     }
 }//table = word|frequency|total|probability
