@@ -40,6 +40,7 @@ namespace AutomaticTextClassification
 
                 File.AppendAllText(csvPath, csv);
             }
+          
         }
     }
 }

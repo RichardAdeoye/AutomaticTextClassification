@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using static AutomaticTextClassification.ProcessingTools;
 namespace AutomaticTextClassification
 {
     class Program
@@ -63,9 +63,14 @@ namespace AutomaticTextClassification
             LabourPriorProb = labourTotal / tDocCount;
             
             ConservativePriorProb = conservativeTotal / tDocCount;
+            
+            RefreshCsvFiles();
 
-            DocumentProcessor.ProcessTextFiles(trainingCategories);
+            DocumentProcessor.ProcessCoalitionFiles(trainingCategories);
+            DocumentProcessor.ProcessConservativeFiles(trainingCategories);
+            DocumentProcessor.ProcessLabourFiles(trainingCategories);
            
+            DocumentClassifier.test();
         }
     }
 }//table = word|frequency|total|probability

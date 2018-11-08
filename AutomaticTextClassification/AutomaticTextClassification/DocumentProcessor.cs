@@ -2,133 +2,135 @@
 using System.IO;
 using System.Linq;
 using static AutomaticTextClassification.Program;
+using static AutomaticTextClassification.ProcessingTools;
 
 namespace AutomaticTextClassification
 {
     class DocumentProcessor
     {
+        public static List<string> CoalitionWordList= new List<string>();
+        public static List<string> ConservativeWordList = new List<string>();
+        public static List<string> LabourWordList = new List<string>();
+
         public static readonly List<double> CoalitionConProb = new List<double>();
         public static readonly List<double> ConservativeConProb = new List<double>();
         public static readonly List<double> LabourConProb = new List<double>();
-
-
-        public static Dictionary<string, int> LabDictionary { get; set; }
-
-        public static Dictionary<string, int> ConDictionary { get; set; }
-
-        public static Dictionary<string, int> CoalDictionary { get; set; }
-
-        public static void ProcessTextFiles(IEnumerable<string> trainingCategories)
+        
+        public static Dictionary<string, int> LabDictionary = new Dictionary<string, int>();
+        public static Dictionary<string, int> ConservDictionary = new Dictionary<string, int>();
+        public static Dictionary<string, int> CoalDictionary = new Dictionary<string, int>();
+        
+        public static void ProcessCoalitionFiles(IEnumerable<string> trainingCategories)
         {
-            RefreshCsvFiles();
-            //if category maatch ...for each catgory where names match join text and extract it
+            
+            List<string> uniqueTrainingTextWords = new List<string>();
+            List<double> conditionalProbabilities = new List<double>();
             foreach (var trainingCategory in trainingCategories)
-            {//group categories 
-
-                var trainingFilePath = Path.Combine(CurrentDirectory, trainingCategory);
-
-
-                //Create user input for files and separate training and test file variables
-                //get collection of each category
-
-                string trainingTextFile;
-                List<string> trainingTextList;
-                ProcessFileToList(trainingFilePath, out trainingTextFile, out trainingTextList);
-
-                var uniqueTrainingTextWords = trainingTextFile.Split(' ', ',', '.').Distinct().ToList(); //Unique words in training set
-                Dictionary<string, int> wordDictionary = new Dictionary<string, int>();
-                List<double> conditionalProbabilities = new List<double>();
-                foreach (var word in trainingTextList.Distinct()) // total number of unique words throughout the training documents (Frequency)
-                {
-                    if (word != "")
-                    {
-                        int wordFrequency = trainingTextList.Count(x => x == word);
-
-                        wordDictionary.Add(word, wordFrequency);
-
-                        double conProbability = (wordFrequency + 1f) / (trainingTextList.Count + uniqueTrainingTextWords.Count);
-                        conditionalProbabilities.Add(conProbability);
-                        //Console.WriteLine(word + ": " + wordFrequency + " -------" + conProbability);
-                    };
-                }
-                CoalDictionary = new Dictionary<string, int>();
-                ConDictionary = new Dictionary<string, int>();
-                LabDictionary = new Dictionary<string, int>();
-                foreach (var i in wordDictionary)
-                {
-                    if (trainingCategory.Contains(Coalition))
-                    {
-                        CoalDictionary.Add(i.Key, i.Value);
-                    }
-                    else if (trainingCategory.Contains(Conservative))
-                    {
-                        ConDictionary.Add(i.Key, i.Value);
-                    }
-                    else if (trainingCategory.Contains(Labour))
-                    {
-                       LabDictionary.Add(i.Key, i.Value);
-                    }
-                }
-
-                foreach (var conditionalProbability in conditionalProbabilities)
-                {
-                    if (trainingCategory.Contains(Coalition))
-                    {
-                        CoalitionConProb.Add(conditionalProbability);
-                    }
-                    if (trainingCategory.Contains(Conservative))
-                    {
-                        ConservativeConProb.Add(conditionalProbability);
-                    }
-                    if (trainingCategory.Contains(Labour))
-                    {
-                        LabourConProb.Add(conditionalProbability);
-                    }
-                }
-                FileWriter.WriteToCsv(trainingCategory, wordDictionary, conditionalProbabilities);
-            }
-            DocumentClassifier.Classify();
-        }
-
-
-        public static void ProcessFileToList(string textFilePath, out string textFile, out List<string> textList)
-        {
-            textFile = ReFormatTextFile(textFilePath);
-            var textWords = textFile.Split(' ', ',', '.').ToList();
-
-            textList = RemoveStopWords(textWords).ToList();
-            //get count from this
-        }
-
-        private static string ReFormatTextFile(string textFilePath)
-        {
-            var textFile = File.ReadAllText(textFilePath).ToLower();
-            textFile = textFile.Replace("\n", "");
-            textFile = textFile.Replace("\r", "");
-            return textFile;
-        }
-
-        private static void RefreshCsvFiles()
-        {
-            var directory = Directory.GetFiles(Program.CurrentDirectory);
-            foreach (var f in directory)
             {
-                if (f.Contains(".csv"))
+                if (trainingCategory.Contains(Coalition))
                 {
-                    File.Delete(f);
+                    var trainingFilePath = Path.Combine(CurrentDirectory, trainingCategory);
+                    ProcessFileToList(trainingFilePath, out var trainingTextFile, out CoalitionWordList);
+                    uniqueTrainingTextWords =
+                        trainingTextFile.Split(' ', ',', '.').Distinct().ToList(); //Unique words in training set
                 }
             }
+            foreach (var word in CoalitionWordList.Distinct())
+            {
+                if (word != "")
+                {
+                    int wordFrequency = CoalitionWordList.Count(x => x == word);
+
+                    //wordDictionary.Add(word, wordFrequency);
+                    CoalDictionary.Add(word, wordFrequency);
+
+                    double condProbability = (wordFrequency + 1f) /
+                                             (CoalitionWordList.Count + uniqueTrainingTextWords.Count);
+                    conditionalProbabilities.Add(condProbability);
+                    //Console.WriteLine(word + ": " + wordFrequency + " -------" + conProbability);
+                }
+            }
+            foreach (var conditionalProbability in conditionalProbabilities)
+            {
+                CoalitionConProb.Add(conditionalProbability);
+            }
+            FileWriter.WriteToCsv(Coalition, CoalDictionary, conditionalProbabilities);
+
         }
 
-        private static List<string> RemoveStopWords(List<string> trainingTextWords)
+        public static void ProcessConservativeFiles(IEnumerable<string> trainingCategories)
         {
-            var stopWordsFilePath = Path.Combine(Directory.GetCurrentDirectory().Replace("\\AutomaticTextClassification\\bin\\Debug", ""), "stopwords.txt");
-            var stopWordsFile = File.ReadAllText(stopWordsFilePath);
-            stopWordsFile = stopWordsFile.Replace("\n", "");
-            string[] x = stopWordsFile.Split();
+           
+            List<string> uniqueTrainingTextWords = new List<string>();
+            List<double> conditionalProbabilities = new List<double>();
+            foreach (var trainingCategory in trainingCategories)
+            {
+                if (trainingCategory.Contains(Conservative))
+                {
+                    var trainingFilePath = Path.Combine(CurrentDirectory, trainingCategory);
+                    ProcessFileToList(trainingFilePath, out var trainingTextFile, out ConservativeWordList);
+                    uniqueTrainingTextWords =
+                        trainingTextFile.Split(' ', ',', '.').Distinct().ToList(); //Unique words in training set
+                }
+            }
+            foreach (var word in ConservativeWordList.Distinct())
+            {
+                if (word != "")
+                {
+                    int wordFrequency = ConservativeWordList.Count(x => x == word);
 
-            var trainingTextList = trainingTextWords.Where(i => !x.Contains(i)).ToList();
-            return trainingTextList;
+                    //wordDictionary.Add(word, wordFrequency);
+                    ConservDictionary.Add(word, wordFrequency);
+
+                    double condProbability = (wordFrequency + 1f) /
+                                             (ConservativeWordList.Count + uniqueTrainingTextWords.Count);
+                    conditionalProbabilities.Add(condProbability);
+                    //Console.WriteLine(word + ": " + wordFrequency + " -------" + conProbability);
+                }
+            }
+            foreach (var conditionalProbability in conditionalProbabilities)
+            {
+                    ConservativeConProb.Add(conditionalProbability);
+            }
+            FileWriter.WriteToCsv(Conservative, ConservDictionary,conditionalProbabilities);
+
+        }
+
+        public static void ProcessLabourFiles(IEnumerable<string> trainingCategories)
+        {
+            
+            List<string> uniqueTrainingTextWords = new List<string>();
+            List<double> conditionalProbabilities = new List<double>();
+            foreach (var trainingCategory in trainingCategories)
+            {
+                if (trainingCategory.Contains(Labour))
+                {
+                    var trainingFilePath = Path.Combine(CurrentDirectory, trainingCategory);
+                    ProcessFileToList(trainingFilePath, out var trainingTextFile, out LabourWordList);
+                    uniqueTrainingTextWords =
+                        trainingTextFile.Split(' ', ',', '.').Distinct().ToList(); //Unique words in training set
+                }
+            }
+            foreach (var word in LabourWordList.Distinct())
+            {
+                if (word != "")
+                {
+                    int wordFrequency = LabourWordList.Count(x => x == word);
+
+                    //wordDictionary.Add(word, wordFrequency);
+                    LabDictionary.Add(word, wordFrequency);
+
+                    double condProbability = (wordFrequency + 1f) /
+                                             (LabourWordList.Count + uniqueTrainingTextWords.Count);
+                    conditionalProbabilities.Add(condProbability);
+                    //Console.WriteLine(word + ": " + wordFrequency + " -------" + conProbability);
+                }
+            }
+            foreach (var conditionalProbability in conditionalProbabilities)
+            {
+                    LabourConProb.Add(conditionalProbability);
+            }
+            FileWriter.WriteToCsv(Labour, LabDictionary ,conditionalProbabilities);
         }
     }
 }

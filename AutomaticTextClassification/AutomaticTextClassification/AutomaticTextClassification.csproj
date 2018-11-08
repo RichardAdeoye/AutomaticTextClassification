@@ -45,6 +45,7 @@
     <Compile Include="DocumentClassifier.cs" />
     <Compile Include="DocumentProcessor.cs" />
     <Compile Include="FileWriter.cs" />
+    <Compile Include="ProcessingTools.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
