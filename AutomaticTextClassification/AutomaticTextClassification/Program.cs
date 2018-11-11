@@ -29,7 +29,7 @@ namespace AutomaticTextClassification
 
             foreach (var file in textFiles)
             {
-                if (!file.Contains("test") && !file.Contains("stop"))
+                if (!file.Contains("ClassifyDocument") && !file.Contains("stop"))
                 {
                     trainingCategories.Add(file);
                    // Console.WriteLine(file);
@@ -70,7 +70,7 @@ namespace AutomaticTextClassification
             DocumentProcessor.ProcessConservativeFiles(trainingCategories);
             DocumentProcessor.ProcessLabourFiles(trainingCategories);
            
-            DocumentClassifier.test();
+            DocumentClassifier.ClassifyDocument();
         }
     }
 }//table = word|frequency|total|probability
