@@ -17,9 +17,37 @@ namespace AutomaticTextClassification
         private static Dictionary<string, double> LabCondDictionary = new Dictionary<string, double>();
 
         public static Dictionary<string, double> FileOptionDictionary;
+        
+        public static void ReadCSV()
+        {
+            Console.WriteLine("Enter the file you would like to undergo training:");
 
+            //read from csv and train new network or use existing network
+            string fileToTrain = Console.ReadLine();
+            var trainingPath = Path.Combine(CurrentDirectory, fileToTrain);
+            var x = File.ReadAllLines(trainingPath);
+            foreach(var i in x)
+            {
+                Dictionary<string, int> tempfrequency = new Dictionary<string, int>();
+                Dictionary<string, double> tempconditionalP = new Dictionary<string, double>();
+
+                int frequency = 0;
+                var splitData = i.Split(',');
+
+                Int32.TryParse(splitData[1], out frequency);
+                tempfrequency.Add(splitData[0], frequency );
+
+                tempconditionalP.Add(splitData[0], Convert.ToDouble(splitData[2]));
+            }
+            //read text file or bayesian network
+            //add the data to a temp dictionary
+            //split on commas and store values in dictionary
+            //b
+        }
         public static void ClassifyDocument()
         {
+
+            ReadCSV();///testing
             CreateConditionalProbDictionary(CoalDictionary, CoalitionConProb, CoalCondDictionary);
             CreateConditionalProbDictionary(ConservDictionary, ConservativeConProb, ConservCondDictionary);
             CreateConditionalProbDictionary(LabDictionary, LabourConProb, LabCondDictionary);
