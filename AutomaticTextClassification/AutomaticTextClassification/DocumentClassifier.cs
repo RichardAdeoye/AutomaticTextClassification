@@ -39,19 +39,19 @@ namespace AutomaticTextClassification
 
                 tempconditionalP.Add(splitData[0], Convert.ToDouble(splitData[2]));
             }
-            //read text file or bayesian network
-            //add the data to a temp dictionary
-            //split on commas and store values in dictionary
-            //b
+        
+            Console.WriteLine("Training Completed! Press ENTER to return to menu...");
+            Console.ReadLine();
+            Console.Clear();
+            MainMenu();
         }
         public static void ClassifyDocument()
         {
 
-            ReadCSV();///testing
             CreateConditionalProbDictionary(CoalDictionary, CoalitionConProb, CoalCondDictionary);
             CreateConditionalProbDictionary(ConservDictionary, ConservativeConProb, ConservCondDictionary);
             CreateConditionalProbDictionary(LabDictionary, LabourConProb, LabCondDictionary);
-            //"test1.txt"
+          
             Console.WriteLine("Enter the file you would like to be classified:");
             var fileOption = Console.ReadLine();
             string optionFilePath = Path.Combine(CurrentDirectory, fileOption);

@@ -19,7 +19,7 @@ namespace AutomaticTextClassification
         public static Dictionary<string, int> LabDictionary = new Dictionary<string, int>();
         public static Dictionary<string, int> ConservDictionary = new Dictionary<string, int>();
         public static Dictionary<string, int> CoalDictionary = new Dictionary<string, int>();
-        
+        //refactor into one method
         public static void ProcessCoalitionFiles(IEnumerable<string> trainingCategories)
         {
             

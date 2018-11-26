@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using static AutomaticTextClassification.ProcessingTools;
 namespace AutomaticTextClassification
 {
@@ -69,8 +71,58 @@ namespace AutomaticTextClassification
             DocumentProcessor.ProcessCoalitionFiles(trainingCategories);
             DocumentProcessor.ProcessConservativeFiles(trainingCategories);
             DocumentProcessor.ProcessLabourFiles(trainingCategories);
-           
-            DocumentClassifier.ClassifyDocument();
+            MainMenu();
+        }
+
+        public static void MainMenu()
+        {
+            string mainTitle = "_Automatic Text Classification_";
+            StringBuilder titleLine = new StringBuilder();
+            titleLine.Length = Console.WindowWidth;
+            titleLine.Insert((titleLine.Length - mainTitle.Length) / 2, mainTitle, 1);
+        
+            Console.Title = mainTitle;
+            Console.WriteLine(titleLine.ToString());
+
+            Console.WriteLine(" Menu");
+            Console.WriteLine("========================================================================================================================");
+
+            string[] Options;
+            Options = new string[2];
+            Options[0] = "Classify Text File";
+            Options[1] = "Undertake Training";
+
+            Console.WriteLine("Please Select an option by pressing 1 or 2, then hit ENTER:");
+            Console.WriteLine("1. " + Options[0].ToString());
+            Console.WriteLine("2. " + Options[1].ToString());
+            Console.WriteLine();
+
+
+            string usersSelection;
+            usersSelection = Console.ReadLine();
+
+
+            {
+                if (usersSelection == "1")
+                {
+                    Console.Clear();
+                    DocumentClassifier.ClassifyDocument();
+                }
+                else
+                if (usersSelection == "2")
+                {
+                    Console.Clear();
+                    DocumentClassifier.ReadCSV();
+                }
+                else
+                {
+                    Console.WriteLine("Please Enter either 1 or 2...Press ENTER to reset");
+                    Console.ReadLine();
+                    Console.Clear();
+                    MainMenu();
+                }
+            }
+            
         }
     }
-}//table = word|frequency|total|probability
+}
