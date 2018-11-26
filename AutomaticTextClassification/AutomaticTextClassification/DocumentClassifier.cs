@@ -40,10 +40,10 @@ namespace AutomaticTextClassification
                 tempconditionalP.Add(splitData[0], Convert.ToDouble(splitData[2]));
             }
         
-            Console.WriteLine("Training Completed! Press ENTER to return to menu...");
+            Console.WriteLine("Training Completed! Press ENTER to proceed to classification...");
             Console.ReadLine();
             Console.Clear();
-            MainMenu();
+            ClassifyDocument();
         }
         public static void ClassifyDocument()
         {
