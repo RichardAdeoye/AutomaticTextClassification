@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static AutomaticTextClassification.DocumentProcessor;
 using static AutomaticTextClassification.Program;
 using static AutomaticTextClassification.ProcessingTools;
@@ -68,7 +65,6 @@ namespace AutomaticTextClassification
                 }
             }
 
-
             double coalitionLogProb = 0f;
             double conservativeLogProb = 0f;
             double labourLogProb = 0f;
@@ -98,10 +94,22 @@ namespace AutomaticTextClassification
             Console.WriteLine("Conservative Probability: " + conservativeLogProb);
             Console.WriteLine("Labour Probability: " + labourLogProb);
 
+            if (coalitionLogProb > conservativeLogProb && coalitionLogProb > labourLogProb)
+            {
+                Console.WriteLine("\n This Queen's Speech shows it is a Coalition Government.");
+            }
+            else if (conservativeLogProb > coalitionLogProb && conservativeLogProb > labourLogProb)
+            {
+                Console.WriteLine("\n This Queen's Speech shows it is a Conservative Government.");
+            }
+            else
+            {
+                Console.WriteLine("\n This Queen's Speech shows it is a Labour Government.");
+            }
             Console.ReadLine();
 
-            //state probability %
-            //state which has higher value and what its classified as
+            //STATE PROBABILITY %
+            //STATE WHICH HAS HIGHER VALUE AND WHAT ITS CLASSIFIED AS
         }
 
         public static void CreateConditionalProbDictionary(Dictionary<string, int> inputDictionary,

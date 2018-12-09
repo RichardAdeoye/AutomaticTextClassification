@@ -15,13 +15,10 @@ namespace AutomaticTextClassification
                 var csv = string.Concat(data.Key + "," + data.Value + "," + conditionalProbabilities[i], Environment.NewLine);
                 i++;
 
-                // Add count to table
-
                 string tableName = null;
 
                 if (trainingCategory.Contains(Labour))
                 {
-                    //join the text in identical categories and total their count here somehow!
                     tableName = $@"{Labour}Table.csv";
                 }
                 else if (trainingCategory.Contains(Conservative))

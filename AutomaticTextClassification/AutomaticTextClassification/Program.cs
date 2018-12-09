@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using static AutomaticTextClassification.ProcessingTools;
+using static AutomaticTextClassification.DocumentProcessor;
 namespace AutomaticTextClassification
 {
     class Program
@@ -19,6 +18,10 @@ namespace AutomaticTextClassification
         public static double LabourPriorProb;
         public static double ConservativePriorProb;
 
+        public static List<string> CoalitionWordList = new List<string>();
+        public static List<string> ConservativeWordList = new List<string>();
+        public static List<string> LabourWordList = new List<string>();
+
         static void Main(string[] args)
         {
             string[] textFiles = Directory
@@ -27,14 +30,13 @@ namespace AutomaticTextClassification
                  .Select(Path.GetFileName)
                  .ToArray();
 
-            List<string> trainingCategories = new List<string>();// get prior probability of files
+            List<string> trainingCategories = new List<string>();
 
             foreach (var file in textFiles)
             {
                 if (!file.Contains("ClassifyDocument") && !file.Contains("stop"))
                 {
                     trainingCategories.Add(file);
-                   // Console.WriteLine(file);
                 }
             }
 
@@ -68,61 +70,11 @@ namespace AutomaticTextClassification
             
             RefreshCsvFiles();
 
-            DocumentProcessor.ProcessCoalitionFiles(trainingCategories);
-            DocumentProcessor.ProcessConservativeFiles(trainingCategories);
-            DocumentProcessor.ProcessLabourFiles(trainingCategories);
-            MainMenu();
-        }
+            ProcessFiles(trainingCategories, Coalition, CoalitionWordList, CoalDictionary, CoalitionConProb);
+            ProcessFiles(trainingCategories, Conservative, ConservativeWordList, ConservDictionary, ConservativeConProb);
+            ProcessFiles(trainingCategories, Labour, LabourWordList, LabDictionary, LabourConProb);
 
-        public static void MainMenu()
-        {
-            string mainTitle = "_Automatic Text Classification_";
-            StringBuilder titleLine = new StringBuilder();
-            titleLine.Length = Console.WindowWidth;
-            titleLine.Insert((titleLine.Length - mainTitle.Length) / 2, mainTitle, 1);
-        
-            Console.Title = mainTitle;
-            Console.WriteLine(titleLine.ToString());
-
-            Console.WriteLine(" Menu");
-            Console.WriteLine("========================================================================================================================");
-
-            string[] Options;
-            Options = new string[2];
-            Options[0] = "Classify Text File";
-            Options[1] = "Undertake Training";
-
-            Console.WriteLine("Please Select an option by pressing 1 or 2, then hit ENTER:");
-            Console.WriteLine("1. " + Options[0].ToString());
-            Console.WriteLine("2. " + Options[1].ToString());
-            Console.WriteLine();
-
-
-            string usersSelection;
-            usersSelection = Console.ReadLine();
-
-
-            {
-                if (usersSelection == "1")
-                {
-                    Console.Clear();
-                    DocumentClassifier.ClassifyDocument();
-                }
-                else
-                if (usersSelection == "2")
-                {
-                    Console.Clear();
-                    DocumentClassifier.ReadCSV();
-                }
-                else
-                {
-                    Console.WriteLine("Please Enter either 1 or 2...Press ENTER to reset");
-                    Console.ReadLine();
-                    Console.Clear();
-                    MainMenu();
-                }
-            }
-            
+            MainMenu.RunMenu();
         }
     }
 }
