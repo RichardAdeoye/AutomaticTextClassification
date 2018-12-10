@@ -44,7 +44,7 @@ namespace AutomaticTextClassification
 
                     categoryDictionary.Add(word, wordFrequency);
 
-                    double condProbability = (wordFrequency + 1f) /
+                    double condProbability = (wordFrequency + 1D) /
                                              (wordList.Count + uniqueTrainingTextWords.Count);
                     conditionalProbabilities.Add(condProbability);
          

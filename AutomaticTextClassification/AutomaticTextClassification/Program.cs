@@ -22,19 +22,19 @@ namespace AutomaticTextClassification
         public static List<string> ConservativeWordList = new List<string>();
         public static List<string> LabourWordList = new List<string>();
 
+        public static List<string> trainingCategories = new List<string>();
+
         static void Main(string[] args)
         {
             string[] textFiles = Directory
                  .GetFiles(Path.Combine(
                    CurrentDirectory), "*.txt")
                  .Select(Path.GetFileName)
-                 .ToArray();
-
-            List<string> trainingCategories = new List<string>();
+                 .ToArray();         
 
             foreach (var file in textFiles)
             {
-                if (!file.Contains("ClassifyDocument") && !file.Contains("stop"))
+                if (!file.Contains("ClassifyDocument") && !file.Contains("stop") && !file.Contains("test"))
                 {
                     trainingCategories.Add(file);
                 }
@@ -42,14 +42,15 @@ namespace AutomaticTextClassification
 
             var tDocCount = trainingCategories.Count();
 
-            double coalitionTotal = 0f;
-            double labourTotal = 0f;
-            double conservativeTotal = 0f;
+            double coalitionTotal = 0D;
+            double labourTotal = 0D;
+            double conservativeTotal = 0D;
             foreach (var trainingCategory in trainingCategories)
             {
                 if (trainingCategory.Contains(Coalition))
                 {
                     coalitionTotal = coalitionTotal + 1;
+                    
                 }
                 else if (trainingCategory.Contains(Labour))
                 {
@@ -70,9 +71,6 @@ namespace AutomaticTextClassification
             
             RefreshCsvFiles();
 
-            ProcessFiles(trainingCategories, Coalition, CoalitionWordList, CoalDictionary, CoalitionConProb);
-            ProcessFiles(trainingCategories, Conservative, ConservativeWordList, ConservDictionary, ConservativeConProb);
-            ProcessFiles(trainingCategories, Labour, LabourWordList, LabDictionary, LabourConProb);
 
             MainMenu.RunMenu();
         }

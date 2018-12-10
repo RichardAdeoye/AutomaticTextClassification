@@ -26,7 +26,7 @@ namespace AutomaticTextClassification
             foreach(var i in x)
             {
                 Dictionary<string, int> tempfrequency = new Dictionary<string, int>();
-                Dictionary<string, double> tempconditionalP = new Dictionary<string, double>();
+                Dictionary<string, double> tempconditionalProb = new Dictionary<string, double>();
 
                 int frequency = 0;
                 var splitData = i.Split(',');
@@ -34,7 +34,7 @@ namespace AutomaticTextClassification
                 Int32.TryParse(splitData[1], out frequency);
                 tempfrequency.Add(splitData[0], frequency );
 
-                tempconditionalP.Add(splitData[0], Convert.ToDouble(splitData[2]));
+                tempconditionalProb.Add(splitData[0], Convert.ToDouble(splitData[2]));
             }
         
             Console.WriteLine("Training Completed! Press ENTER to proceed to classification...");
@@ -45,11 +45,9 @@ namespace AutomaticTextClassification
         public static void ClassifyDocument()
         {
 
-            CreateConditionalProbDictionary(CoalDictionary, CoalitionConProb, CoalCondDictionary);
-            CreateConditionalProbDictionary(ConservDictionary, ConservativeConProb, ConservCondDictionary);
-            CreateConditionalProbDictionary(LabDictionary, LabourConProb, LabCondDictionary);
+         
           
-            Console.WriteLine("Enter the file you would like to be classified:");
+            Console.WriteLine("Enter the Document you would like to be classified:");
             var fileOption = Console.ReadLine();
             string optionFilePath = Path.Combine(CurrentDirectory, fileOption);
 
@@ -64,6 +62,14 @@ namespace AutomaticTextClassification
                     FileOptionDictionary.Add(item, wordFrequency);
                 }
             }
+
+            ProcessFiles(trainingCategories, Coalition, Program.CoalitionWordList, CoalDictionary, CoalitionConProb);
+            ProcessFiles(trainingCategories, Conservative, Program.ConservativeWordList, ConservDictionary, ConservativeConProb);
+            ProcessFiles(trainingCategories, Labour, Program.LabourWordList, LabDictionary, LabourConProb);
+
+            CreateConditionalProbDictionary(CoalDictionary, CoalitionConProb, CoalCondDictionary);
+            CreateConditionalProbDictionary(ConservDictionary, ConservativeConProb, ConservCondDictionary);
+            CreateConditionalProbDictionary(LabDictionary, LabourConProb, LabCondDictionary);
 
             double coalitionLogProb = 0f;
             double conservativeLogProb = 0f;
@@ -106,7 +112,13 @@ namespace AutomaticTextClassification
             {
                 Console.WriteLine("\n This Queen's Speech shows it is a Labour Government.");
             }
+
+            Console.WriteLine("Press ENTER to classify another Document or train a new file... ");
             Console.ReadLine();
+
+            Console.Clear();
+            MainMenu.RunMenu();
+
 
             //STATE PROBABILITY %
             //STATE WHICH HAS HIGHER VALUE AND WHAT ITS CLASSIFIED AS
