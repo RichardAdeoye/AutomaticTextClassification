@@ -33,27 +33,40 @@ namespace AutomaticTextClassification
                     var trainingFilePath = Path.Combine(CurrentDirectory, trainingCategory);
                     ProcessFileToList(trainingFilePath, out var trainingTextFile, out wordList);
                     uniqueTrainingTextWords =
-                        trainingTextFile.Split(' ', ',', '.').Distinct().ToList(); 
+                        trainingTextFile.Split(' ', ',', '.').Distinct().ToList();
+
+                    foreach (var word in wordList.Distinct())
+                    {
+                        if (word != "")
+                        {
+                            int wordFrequency = wordList.Count(x => x == word);
+
+                            if (categoryDictionary.ContainsKey(word))
+                            {
+                                categoryDictionary[word] = categoryDictionary[word] + wordFrequency;
+                            }
+                            else
+                            {
+                                categoryDictionary.Add(word, wordFrequency);
+                            }
+                      
+
+                        }
+                    }
+                    foreach(var pair in categoryDictionary)
+                    {
+                        double condProbability = (pair.Value + 1D) /
+                                               (wordList.Count + uniqueTrainingTextWords.Count);
+                        conditionalProbabilities.Add(condProbability);
+                    }
+                    foreach (var conditionalProbability in conditionalProbabilities)
+                    {
+                        categoryConProbability.Add(conditionalProbability);
+                    }
                 }
+                
             }
-            foreach (var word in wordList.Distinct())
-            {
-                if (word != "")
-                {
-                    int wordFrequency = wordList.Count(x => x == word);
-
-                    categoryDictionary.Add(word, wordFrequency);
-
-                    double condProbability = (wordFrequency + 1D) /
-                                             (wordList.Count + uniqueTrainingTextWords.Count);
-                    conditionalProbabilities.Add(condProbability);
          
-                }
-            }
-            foreach (var conditionalProbability in conditionalProbabilities)
-            {
-                categoryConProbability.Add(conditionalProbability);
-            }
             FileWriter.WriteToCsv(categoryName, categoryDictionary, conditionalProbabilities);
         }
     }

@@ -13,7 +13,7 @@ namespace AutomaticTextClassification
         private static Dictionary<string, double> ConservCondDictionary = new Dictionary<string, double>();
         private static Dictionary<string, double> LabCondDictionary = new Dictionary<string, double>();
 
-        public static Dictionary<string, double> FileOptionDictionary;
+        public static Dictionary<string, double> testFileDictionary;
         
         public static void ReadCSV()
         {
@@ -52,14 +52,14 @@ namespace AutomaticTextClassification
             string optionFilePath = Path.Combine(CurrentDirectory, fileOption);
 
             ProcessFileToList(optionFilePath, out fileOption, out var optionFileList);
-            FileOptionDictionary = new Dictionary<string, double>();
+            testFileDictionary = new Dictionary<string, double>();
 
             foreach (var item in optionFileList.Distinct())
             {
                 if (item != "")
                 {
                     double wordFrequency = optionFileList.Count(x => x == item);
-                    FileOptionDictionary.Add(item, wordFrequency);
+                    testFileDictionary.Add(item, wordFrequency);
                 }
             }
 
@@ -74,21 +74,21 @@ namespace AutomaticTextClassification
             double coalitionLogProb = 0f;
             double conservativeLogProb = 0f;
             double labourLogProb = 0f;
-            foreach (var word in FileOptionDictionary.Keys)
+            foreach (var word in testFileDictionary.Keys)
             {
                 if (CoalCondDictionary.ContainsKey(word))
                 {
-                    coalitionLogProb += Math.Log(Math.Pow(CoalCondDictionary[word], FileOptionDictionary[word]));
+                    coalitionLogProb += Math.Log(Math.Pow(CoalCondDictionary[word], testFileDictionary[word]));
                 }
 
                 if (ConservCondDictionary.ContainsKey(word))
                 {
-                    conservativeLogProb += Math.Log(Math.Pow(ConservCondDictionary[word], FileOptionDictionary[word]));
+                    conservativeLogProb += Math.Log(Math.Pow(ConservCondDictionary[word], testFileDictionary[word]));
                 }
 
                 if (LabCondDictionary.ContainsKey(word))
                 {
-                    labourLogProb += Math.Log(Math.Pow(LabCondDictionary[word], FileOptionDictionary[word]));
+                    labourLogProb += Math.Log(Math.Pow(LabCondDictionary[word], testFileDictionary[word]));
                 }
             }
 
