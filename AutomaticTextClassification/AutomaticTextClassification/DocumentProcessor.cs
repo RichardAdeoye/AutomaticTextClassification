@@ -16,58 +16,61 @@ namespace AutomaticTextClassification
         public static readonly List<double> ConservativeConProb = new List<double>();
         public static readonly List<double> LabourConProb = new List<double>();
         
-        public static Dictionary<string, int> LabDictionary = new Dictionary<string, int>();
-        public static Dictionary<string, int> ConservDictionary = new Dictionary<string, int>();
-        public static Dictionary<string, int> CoalDictionary = new Dictionary<string, int>();
+        public static Dictionary<string, double> LabDictionary = new Dictionary<string, double>();
+        public static Dictionary<string, double> ConservDictionary = new Dictionary<string, double>();
+        public static Dictionary<string, double> CoalDictionary = new Dictionary<string, double>();
 
 
-        public static void ProcessFiles(IEnumerable<string> trainingCategories, string categoryName, List<string> wordList,
-            Dictionary<string, int> categoryDictionary, List<double> categoryConProbability)
+        public static void ProcessFiles(IEnumerable<string> trainingDocuments, string categoryName, List<string> wordList,
+            Dictionary<string, double> categoryDictionary, List<double> categoryConProbability)
         {
             List<string> uniqueTrainingTextWords = new List<string>();
             List<double> conditionalProbabilities = new List<double>();
-            foreach (var trainingCategory in trainingCategories)
+            foreach (var trainingCategory in trainingDocuments.Distinct())// loops through all the training documents
             {
-                if (trainingCategory.Contains(categoryName))
+                if (trainingCategory.Contains(categoryName))// checks for given category name 
                 {
-                    var trainingFilePath = Path.Combine(CurrentDirectory, trainingCategory);
-                    ProcessFileToList(trainingFilePath, out var trainingTextFile, out wordList);
-                    uniqueTrainingTextWords =
-                        trainingTextFile.Split(' ', ',', '.').Distinct().ToList();
-
-                    foreach (var word in wordList.Distinct())
+                    var trainingFilePath = Path.Combine(CurrentDirectory, trainingCategory);// gets document directory path
+                    ProcessFileToList(trainingFilePath, out var trainingTextFile, out wordList);// coverts text document to list of words
+                    uniqueTrainingTextWords = trainingTextFile.Split(' ', ',', '.').Distinct().ToList();// gets unique list of words from original list
+                    
+                    foreach (var word in wordList.Distinct())// loops through list of training document word
                     {
                         if (word != "")
                         {
-                            int wordFrequency = wordList.Count(x => x == word);
+                            int wordFrequency = wordList.Count(x => x == word);// gets the frequency of which a word occurs in that list
 
-                            if (categoryDictionary.ContainsKey(word))
+                            if (categoryDictionary.ContainsKey(word))// checks category dictionary for duplicate dictionary pairs
                             {
-                                categoryDictionary[word] = categoryDictionary[word] + wordFrequency;
+                                categoryDictionary[word] = categoryDictionary[word] + wordFrequency;// Merges duplicated dictionary pairs and their values
+                                double condProbability = (wordFrequency + 1D) /
+                                                         (wordList.Count + uniqueTrainingTextWords.Count);//calculates conditional probability of word
+                                conditionalProbabilities.Add(condProbability);// adds conditonal probablility to list
                             }
-                            else
+                            else // if no duplicate keys
                             {
-                                categoryDictionary.Add(word, wordFrequency);
+                                categoryDictionary.Add(word, wordFrequency);//calculates conditional probability of word
+                                double condProbability = (wordFrequency + 1D) /
+                                                         (wordList.Count + uniqueTrainingTextWords.Count);
+
+                                conditionalProbabilities.Add(condProbability);// adds conditonal probablility to list
                             }
                       
 
                         }
                     }
-                    foreach(var pair in categoryDictionary)
-                    {
-                        double condProbability = (pair.Value + 1D) /
-                                               (wordList.Count + uniqueTrainingTextWords.Count);
-                        conditionalProbabilities.Add(condProbability);
-                    }
-                    foreach (var conditionalProbability in conditionalProbabilities)
-                    {
-                        categoryConProbability.Add(conditionalProbability);
-                    }
+                  
+                        foreach (var conditionalProbability in conditionalProbabilities)
+                        {
+                            categoryConProbability.Add(conditionalProbability);// adds all conditional probablities of category to a new list
+                        }
+                   
+                  
                 }
                 
             }
          
-            FileWriter.WriteToCsv(categoryName, categoryDictionary, conditionalProbabilities);
+            FileWriter.WriteToCsv(categoryName, categoryDictionary, conditionalProbabilities);// collected values to a csv document
         }
     }
 }
