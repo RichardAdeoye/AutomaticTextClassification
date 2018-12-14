@@ -81,7 +81,7 @@ namespace AutomaticTextClassification
             Options[0] = "Current Directory";
             Options[1] = "Type in Directory Path";
 
-            Console.WriteLine("Select the directory of the documents you would like to train from (Enter Number): ");
+            Console.WriteLine("Select the directory of the documents you would like to train from (Enter Number and press ENTER): ");
             Console.WriteLine("1. " + Options[0].ToString());
             Console.WriteLine("2. " + Options[1].ToString());
 
@@ -90,29 +90,24 @@ namespace AutomaticTextClassification
             var usersSelection = Console.ReadLine();
             if (usersSelection == "1") // Reads user input and calls Classify document function
             {
-                string[] directoryPath = Directory
-                    .GetFiles(Path.Combine(
-                        CurrentDirectory), "*.txt")
-                    .Select(Path.GetFileName)
-                    .ToArray();// gets all text files from current directory
-
-                foreach (var file in directoryPath)
+                GetTrainingFiles(CurrentDirectory); //gets training files from current directory
+            }
+            else if (usersSelection == "2")
+            {
+                
+                Console.Write("Enter directory path: ");
+                var UserPathInput = Console.ReadLine();
+                if (Directory.Exists(UserPathInput))
                 {
-                    if (!file.Contains("stop") && !file.Contains("test"))
-                    {
-                        trainingDocuments.Add(file);// adds text files to list if they do not contain stop or test so unwanted text files are not read
-                    }
-
+                   GetTrainingFiles(UserPathInput); //gets training files from specified directory
                 }
-                foreach (var trainingDocument in trainingDocuments.Distinct())
+                else
                 {
-                    Console.WriteLine(trainingDocument);// lists training documents found
+                    Console.WriteLine("Path Not Found!");
+                    Console.ReadLine();
+                    Console.Clear();
+                    RunTrainingMenu();
                 }
-
-                Console.WriteLine("\n Training Documents Found. A Bayesian Network will be written from these files. \n Press ENTER to proceed to Classification!");
-                Console.ReadLine();
-                Console.Clear();
-                DocumentClassifier.ClassifyDocument();// executes document classifiyer
 
             }
             else
@@ -124,6 +119,35 @@ namespace AutomaticTextClassification
             }
 
 
+        }
+
+        private static void GetTrainingFiles(string pathInput)
+        {
+            string[] directoryPath = Directory
+                .GetFiles(Path.Combine(
+                    pathInput), "*.txt")
+                .Select(Path.GetFileName)
+                .ToArray(); // gets all text files from current directory
+
+            foreach (var file in directoryPath)
+            {
+                if (!file.Contains("stop") && !file.Contains("test"))
+                {
+                    trainingDocuments
+                        .Add(file); // adds text files to list if they do not contain stop or test so unwanted text files are not read
+                }
+            }
+
+            foreach (var trainingDocument in trainingDocuments.Distinct())
+            {
+                Console.WriteLine(trainingDocument); // lists training documents found
+            }
+
+            Console.WriteLine(
+                "\n Training Documents Found. A Bayesian Network will be written from these files. \n Press ENTER to proceed to Classification!");
+            Console.ReadLine();
+            Console.Clear();
+            DocumentClassifier.ClassifyDocument(); // executes document classifiyer
         }
     }
 }
